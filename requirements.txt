@@ -1,6 +1,7 @@
 einops
 mlflow
 opencv-python
+protobuf==3.20
 pytorch-lightning==1.1.4
 -f https://download.pytorch.org/whl/torch_stable.html
 torch==1.7.1+cu101
