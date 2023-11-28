@@ -21,6 +21,7 @@ from tqdm import tqdm
 from config import cfg
 from losses.center_loss import CenterLoss
 from losses.triplet_loss import CrossEntropyLabelSmooth, TripletLoss
+from losses.ap_loss import APLoss, TAPLoss, TripletMarginLoss, TripletLogExpLoss
 from modelling.baseline import Baseline
 from solver import build_optimizer, build_scheduler
 from utils.reid_metric import R1_mAP

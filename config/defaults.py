@@ -176,6 +176,6 @@ _C.OUTPUT_DIR = ""
 # Whether to seed everything
 _C.REPRODUCIBLE = False
 # Number of runs with seeded generators
-_C.REPRODUCIBLE_NUM_RUNS = 3
+_C.REPRODUCIBLE_NUM_RUNS = 1
 # Seed to start with
 _C.REPRODUCIBLE_SEED = 0
