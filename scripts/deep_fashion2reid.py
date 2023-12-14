@@ -364,7 +364,16 @@ Script crops the bounding boxes and resizes them to the target size. Width x Hei
             str(ROOT_DIR / "img_highres/CLOTHING/Summer_Suit"),
             str(ROOT_DIR / "img_highres/CLOTHING/Summer_Wear"),
         )
-
+    if (ROOT_DIR / "img_highres/TOPS/Summer_Suit").is_dir():
+        shutil.move(
+            str(ROOT_DIR / "img_highres/TOPS/Summer_Suit"),
+            str(ROOT_DIR / "img_highres/TOPS/Summer_Wear"),
+        )
+    if (ROOT_DIR / "img_highres/TROUSERS/Summer_Suit").is_dir():
+        shutil.move(
+            str(ROOT_DIR / "img_highres/TROUSERS/Summer_Suit"),
+            str(ROOT_DIR / "img_highres/TROUSERS/Summer_Wear"),
+        )
     ## Get Train/val/test split
     split_load_path = ROOT_DIR / "Eval/list_eval_partition.txt"
     with open(split_load_path, "r") as f:
