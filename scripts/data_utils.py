@@ -178,7 +178,8 @@ def create_image_info(
 
 
 def _resize_thumbnail(im: Image, target_image_size: tuple):
-    im.thumbnail(target_image_size, Image.ANTIALIAS)
+    # im.thumbnail(target_image_size, Image.ANTIALIAS)
+    im.thumbnail(target_image_size, Image.LANCZOS)
     new_image = Image.new("RGB", target_image_size, (255, 255, 255))
     new_image.paste(
         im,
