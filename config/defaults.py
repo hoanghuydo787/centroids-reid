@@ -90,7 +90,7 @@ _C.SOLVER = CN()
 _C.SOLVER.OPTIMIZER_NAME = "Adam"
 # Number of max epoches
 # _C.SOLVER.MAX_EPOCHS = 120
-_C.SOLVER.MAX_EPOCHS = 20 # temporarily set to 20
+_C.SOLVER.MAX_EPOCHS = 16 # temporarily set to 16
 # Base learning rate
 _C.SOLVER.BASE_LR = 1e-4
 # Momentum
