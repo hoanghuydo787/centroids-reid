@@ -71,7 +71,7 @@ _C.DATASETS.JSON_TRAIN_PATH = ""
 # -----------------------------------------------------------------------------
 _C.DATALOADER = CN()
 # Number of data loading threads
-_C.DATALOADER.NUM_WORKERS = 6
+_C.DATALOADER.NUM_WORKERS = 4
 # Sampler for data loading
 _C.DATALOADER.SAMPLER = "random_identity"
 # Number of instance for one batch
@@ -125,7 +125,7 @@ _C.SOLVER.MONITOR_METRIC_MODE = "max"
 # epoch number of saving checkpoints
 _C.SOLVER.CHECKPOINT_PERIOD = 4
 # epoch number of validation
-_C.SOLVER.EVAL_PERIOD = 5
+_C.SOLVER.EVAL_PERIOD = 4
 # Number of images per batch PER GPU
 _C.SOLVER.IMS_PER_BATCH = 64
 # 'dp', 'ddp', 'ddp2', 'ddp_spawn' - see pytorch lighning options
