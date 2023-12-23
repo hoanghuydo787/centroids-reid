@@ -1,1 +1,1 @@
-from .chechpointer_callback import ModelCheckpointPeriodic
+from .checkpointer_callback import ModelCheckpointPeriodic
