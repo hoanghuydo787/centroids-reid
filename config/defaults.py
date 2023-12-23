@@ -60,7 +60,7 @@ _C.INPUT.PADDING = 10
 # -----------------------------------------------------------------------------
 _C.DATASETS = CN()
 # List of the dataset names for training, as present in paths_catalog.py ???
-_C.DATASETS.NAMES = "market1501"
+_C.DATASETS.NAMES = "df1"
 # Root directory where datasets should be used (and downloaded if not found)
 _C.DATASETS.ROOT_DIR = "/home/data"
 # Path to json train file for datasets that require it
@@ -90,7 +90,7 @@ _C.SOLVER = CN()
 _C.SOLVER.OPTIMIZER_NAME = "Adam"
 # Number of max epoches
 # _C.SOLVER.MAX_EPOCHS = 120
-_C.SOLVER.MAX_EPOCHS = 16 # temporarily set to 16
+_C.SOLVER.MAX_EPOCHS = 8 # temporarily set to 8
 # Base learning rate
 _C.SOLVER.BASE_LR = 1e-4
 # Momentum
