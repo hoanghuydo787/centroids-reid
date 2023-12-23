@@ -123,7 +123,7 @@ _C.SOLVER.MONITOR_METRIC_NAME = "mAP"
 # Metric value mode used for checkpointing (max, min, auto)
 _C.SOLVER.MONITOR_METRIC_MODE = "max"
 # epoch number of saving checkpoints
-_C.SOLVER.CHECKPOINT_PERIOD = 50
+_C.SOLVER.CHECKPOINT_PERIOD = 4
 # epoch number of validation
 _C.SOLVER.EVAL_PERIOD = 5
 # Number of images per batch PER GPU
