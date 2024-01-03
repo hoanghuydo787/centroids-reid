@@ -34,8 +34,8 @@ _C.MODEL.USE_CENTROIDS = False
 # do not come from the same camera as the query
 _C.MODEL.KEEP_CAMID_CENTROIDS = True
 # Set True if Pre-traing path points to previously trained/aborted model
-# _C.MODEL.RESUME_TRAINING = False
-_C.MODEL.RESUME_TRAINING = True
+_C.MODEL.RESUME_TRAINING = False
+# _C.MODEL.RESUME_TRAINING = True
 
 # -----------------------------------------------------------------------------
 # INPUT
