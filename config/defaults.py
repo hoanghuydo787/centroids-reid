@@ -131,8 +131,8 @@ _C.SOLVER.EVAL_PERIOD = 4
 # Number of images per batch PER GPU
 _C.SOLVER.IMS_PER_BATCH = 64
 # 'dp', 'ddp', 'ddp2', 'ddp_spawn' - see pytorch lighning options
-# _C.SOLVER.DIST_BACKEND = "ddp"
-_C.SOLVER.DIST_BACKEND = "dp"
+_C.SOLVER.DIST_BACKEND = "ddp"
+# _C.SOLVER.DIST_BACKEND = "dp"
 # Losses weights
 # Weight of classification loss on query vectors
 _C.SOLVER.QUERY_XENT_WEIGHT = 1.0
