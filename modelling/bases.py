@@ -243,6 +243,7 @@ class ModelBase(pl.LightningModule):
                 centroids_embeddings.append(centroids_emb.detach().cpu())
 
         # Make a single tensor from query and gallery data
+        print(centroids_embeddings.shape)
         centroids_embeddings = torch.stack(centroids_embeddings).squeeze()
         centroids_embeddings = torch.cat(
             (embeddings_query, centroids_embeddings), dim=0

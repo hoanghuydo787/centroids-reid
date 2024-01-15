@@ -117,6 +117,7 @@ class ReidBaseDataModule(pl.LightningDataModule):
             self.train,
             self.cfg.SOLVER.IMS_PER_BATCH,
             num_workers=self.num_workers,
+            pin_memory=False,
             shuffle=False,
             sampler=sampler,
             collate_fn=collate_fn_alternative,
@@ -131,6 +132,7 @@ class ReidBaseDataModule(pl.LightningDataModule):
             self.val,
             self.cfg.TEST.IMS_PER_BATCH,
             num_workers=self.num_workers,
+            pin_memory=False,
             sampler=sampler,
             shuffle=False,
         )
@@ -143,6 +145,7 @@ class ReidBaseDataModule(pl.LightningDataModule):
             self.train,
             self.cfg.TEST.IMS_PER_BATCH,
             num_workers=self.num_workers,
+            pin_memory=False,
             sampler=sampler,
             shuffle=False,
         )
@@ -329,6 +332,7 @@ class COCODatasetBase(ReidBaseDataModule):
             self.train,
             self.cfg.SOLVER.IMS_PER_BATCH,
             num_workers=self.num_workers,
+            pin_memory=False,
             shuffle=False,
             sampler=sampler,
             collate_fn=collate_fn_alternative,

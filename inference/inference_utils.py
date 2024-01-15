@@ -97,6 +97,7 @@ def make_inference_data_loader(cfg, path, dataset_class):
         batch_size=cfg.TEST.IMS_PER_BATCH,
         shuffle=False,
         num_workers=num_workers,
+        pin_memory=False,
     )
     return val_loader
 

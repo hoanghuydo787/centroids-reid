@@ -1,4 +1,5 @@
 einops
+gdown
 mlflow
 opencv-python
 protobuf==3.20
