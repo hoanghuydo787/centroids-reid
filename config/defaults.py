@@ -29,14 +29,12 @@ _C.MODEL.PRETRAINED = True
 # Path to weights to load
 _C.MODEL.PRETRAIN_PATH = ""
 # Create centroids
-# _C.MODEL.USE_CENTROIDS = False
-_C.MODEL.USE_CENTROIDS = True
+_C.MODEL.USE_CENTROIDS = False
 # Ensures images to build centroids during retrieval
 # do not come from the same camera as the query
 _C.MODEL.KEEP_CAMID_CENTROIDS = True
 # Set True if Pre-traing path points to previously trained/aborted model
 _C.MODEL.RESUME_TRAINING = False
-# _C.MODEL.RESUME_TRAINING = True
 
 # -----------------------------------------------------------------------------
 # INPUT
@@ -61,8 +59,8 @@ _C.INPUT.PADDING = 10
 # DATASET
 # -----------------------------------------------------------------------------
 _C.DATASETS = CN()
-# List of the dataset names for training, as present in paths_catalog.py ???
-_C.DATASETS.NAMES = "df1"
+# List of the dataset names for training, as present in paths_catalog.py
+_C.DATASETS.NAMES = "market1501"
 # Root directory where datasets should be used (and downloaded if not found)
 _C.DATASETS.ROOT_DIR = "/home/data"
 # Path to json train file for datasets that require it
@@ -73,7 +71,7 @@ _C.DATASETS.JSON_TRAIN_PATH = ""
 # -----------------------------------------------------------------------------
 _C.DATALOADER = CN()
 # Number of data loading threads
-_C.DATALOADER.NUM_WORKERS = 4
+_C.DATALOADER.NUM_WORKERS = 6
 # Sampler for data loading
 _C.DATALOADER.SAMPLER = "random_identity"
 # Number of instance for one batch
@@ -91,8 +89,7 @@ _C.SOLVER = CN()
 # Name of optimizer
 _C.SOLVER.OPTIMIZER_NAME = "Adam"
 # Number of max epoches
-# _C.SOLVER.MAX_EPOCHS = 120
-_C.SOLVER.MAX_EPOCHS = 8 # temporarily set to 8
+_C.SOLVER.MAX_EPOCHS = 120
 # Base learning rate
 _C.SOLVER.BASE_LR = 1e-4
 # Momentum
@@ -125,14 +122,13 @@ _C.SOLVER.MONITOR_METRIC_NAME = "mAP"
 # Metric value mode used for checkpointing (max, min, auto)
 _C.SOLVER.MONITOR_METRIC_MODE = "max"
 # epoch number of saving checkpoints
-_C.SOLVER.CHECKPOINT_PERIOD = 4
+_C.SOLVER.CHECKPOINT_PERIOD = 50
 # epoch number of validation
-_C.SOLVER.EVAL_PERIOD = 4
+_C.SOLVER.EVAL_PERIOD = 5
 # Number of images per batch PER GPU
 _C.SOLVER.IMS_PER_BATCH = 64
 # 'dp', 'ddp', 'ddp2', 'ddp_spawn' - see pytorch lighning options
 _C.SOLVER.DIST_BACKEND = "ddp"
-# _C.SOLVER.DIST_BACKEND = "dp"
 # Losses weights
 # Weight of classification loss on query vectors
 _C.SOLVER.QUERY_XENT_WEIGHT = 1.0
@@ -180,6 +176,6 @@ _C.OUTPUT_DIR = ""
 # Whether to seed everything
 _C.REPRODUCIBLE = False
 # Number of runs with seeded generators
-_C.REPRODUCIBLE_NUM_RUNS = 1
+_C.REPRODUCIBLE_NUM_RUNS = 3
 # Seed to start with
-_C.REPRODUCIBLE_SEED = 1
+_C.REPRODUCIBLE_SEED = 0
