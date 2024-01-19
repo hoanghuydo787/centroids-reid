@@ -76,7 +76,7 @@ class CTLModel(ModelBase):
         xent_query = self.xent(cls_score, class_labels_real)
         xent_query = xent_query * self.hparams.SOLVER.QUERY_XENT_WEIGHT
 
-        # Prepare masks for uneven numbe of sample per pid in a batch
+        # Prepare masks for uneven number of sample per pid in a batch
         ir = isReal.view(unique_classes, -1)
         t = repeat(ir, "c b -> c b s", s=self.hparams.DATALOADER.NUM_INSTANCE)
         t_re = rearrange(t, "c b s -> b (c s)")
