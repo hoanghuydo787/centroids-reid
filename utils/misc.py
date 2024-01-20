@@ -88,8 +88,8 @@ def run_single(cfg, method, logger_save_dir):
     periodic_checkpointer = ModelCheckpointPeriodic(
         dirname=os.path.join(logger.log_dir, "auto_checkpoints"),
         filename_prefix="checkpoint",
-        n_saved=1,
-        save_interval=1,
+        n_saved=3,
+        save_interval=10,
     )
 
     dm = init_dataset(
