@@ -5,6 +5,7 @@ import os
 import shutil
 from collections import defaultdict
 from pathlib import Path
+from tqdm import tqdm
 
 import numpy as np
 from PIL import Image, ImageFile
@@ -59,25 +60,25 @@ def scatter_images_to_folders(
     root_dir, images_org_path, images_root_dir_split, subset_name, subset
 ):
     all_sources = np.unique([item["source_dir"] for item in subset])
-    for source in all_sources:
+    for source in tqdm(all_sources):
         source_path = root_dir / source
         files_in_dir = os.listdir(source_path)
         dir_name = source_path.stem
         dir_path = images_root_dir_split / subset_name / dir_name
         dir_path.mkdir(parents=True, exist_ok=True)
         source_root = source.lstrip("img/")
-        for file in files_in_dir:
+        for file in tqdm(files_in_dir):
             if (dir_path / file).is_file():
                 continue
             shutil.copy(images_org_path / source_root / file, dir_path / file)
 
 
-def create_gloabl_to_pair_id_mapping(split_dict):
+def create_global_to_pair_id_mapping(split_dict):
     global_product_pair_id_map = {}
     unique_pair_id = 0
     for _, subset in split_dict.items():
         all_sources = np.unique([item["source_dir"] for item in subset])
-        for source in all_sources:
+        for source in tqdm(all_sources):
             dir_name = source.split("/")[-1]
             if dir_name not in global_product_pair_id_map:
                 global_product_pair_id_map[dir_name] = unique_pair_id
@@ -117,7 +118,7 @@ def crop_all_images(
     all_annotations = {}
     all_image_infos = {}  # To easily retrieve images neede for the set
     # Crop from high-res images
-    for subset_name in list(split_dict.keys()):
+    for subset_name in tqdm(list(split_dict.keys())):
         CROP_IMAGES_SAVE_PATH = crop_images_save_root / subset_name
         CROP_IMAGES_SAVE_PATH.mkdir(exist_ok=True, parents=True)
 
@@ -126,14 +127,14 @@ def crop_all_images(
         annos = []
         images_subset_root = image_root_dir_split / subset_name
 
-        for dir_name in os.listdir(images_subset_root):
+        for dir_name in tqdm(os.listdir(images_subset_root)):
             if not (images_subset_root / dir_name).is_dir():
                 continue
             pair_id = global_product_pair_id_map[
                 dir_name
             ]  # Pair id is assumed to be the same for all items in a directory of template "id_xxxxxx"
             dir_path = os.path.join(images_subset_root, dir_name)
-            for file in os.listdir(dir_path):
+            for file in tqdm(os.listdir(dir_path)):
                 new_filename = dir_name + "_" + file
                 source_filepath = os.path.join(dir_path, file)
                 # Start preparing image info and annotations
@@ -346,7 +347,7 @@ Script crops the bounding boxes and resizes them to the target size. Width x Hei
     ROOT_DIR = Path(args.root_dir_path)
     TARGET_IMAGE_SIZE = tuple([int(item) for item in args.target_image_size])
     IMAGES_ORG_PATH = ROOT_DIR / "img_highres"
-    LOW_RES_IMAGES_ROOT = ROOT_DIR / "img_low_res"
+    LOW_RES_IMAGES_ROOT = ROOT_DIR / "img_low_res_tmp"
     IMAGES_ROOT_DIR_SPLIT = ROOT_DIR / "images_high_res_tmp"
     IMAGES_ROOT_DIR_SPLIT.mkdir(exist_ok=True)
     CROP_IMAGES_SAVE_ROOT = (
@@ -354,7 +355,11 @@ Script crops the bounding boxes and resizes them to the target size. Width x Hei
     )
     CROP_IMAGES_SAVE_ROOT.mkdir(exist_ok=True)
     assert IMAGES_ORG_PATH.is_dir()
-
+    # fix by https://github.com/mikwieczorek/centroids-reid/issues/24#issuecomment-1173545198
+    IMAGES_LOW_RES_ORG_PATH = ROOT_DIR / "img"
+    IMAGES_LOW_RES_ROOT_DIR_SPLIT = ROOT_DIR / "img_low_res_tmp"
+    IMAGES_LOW_RES_ROOT_DIR_SPLIT.mkdir(exist_ok=True)
+    
     # Rename erronous directory
     log.warn(
         f"{ROOT_DIR / 'img_highres/CLOTHING/Summer_Suit/'} needs to be renamed {ROOT_DIR / 'img_highres/CLOTHING/Summer_Wear/'}. Renaming automatically."
@@ -386,9 +391,11 @@ Script crops the bounding boxes and resizes them to the target size. Width x Hei
         scatter_images_to_folders(
             ROOT_DIR, IMAGES_ORG_PATH, IMAGES_ROOT_DIR_SPLIT, subset_name, subset
         )
-
+        scatter_images_to_folders(
+            ROOT_DIR, IMAGES_LOW_RES_ORG_PATH, IMAGES_LOW_RES_ROOT_DIR_SPLIT, subset_name, subset
+        )
     # Create global mapping to pair-ids
-    global_product_pair_id_map = create_gloabl_to_pair_id_mapping(split_dict)
+    global_product_pair_id_map = create_global_to_pair_id_mapping(split_dict)
 
     # Prepare bboxes
     bbox_load_path = ROOT_DIR / "Anno/list_bbox_consumer2shop.txt"
@@ -404,7 +411,8 @@ Script crops the bounding boxes and resizes them to the target size. Width x Hei
         split_dict=split_dict,
         global_product_pair_id_map=global_product_pair_id_map,
         root_dir=ROOT_DIR,
-        image_root_dir_split=IMAGES_ROOT_DIR_SPLIT,
+        # image_root_dir_split=IMAGES_ROOT_DIR_SPLIT,
+        image_root_dir_split=LOW_RES_IMAGES_ROOT,
         low_res_image_root=LOW_RES_IMAGES_ROOT,
         crop_images_save_root=CROP_IMAGES_SAVE_ROOT,
         target_image_size=TARGET_IMAGE_SIZE,
