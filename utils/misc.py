@@ -89,7 +89,7 @@ def run_single(cfg, method, logger_save_dir):
         dirname=os.path.join(logger.log_dir, "auto_checkpoints"),
         filename_prefix="checkpoint",
         n_saved=3,
-        save_interval=10,
+        save_interval=5,
     )
 
     dm = init_dataset(
@@ -134,9 +134,9 @@ def run_single(cfg, method, logger_save_dir):
             use_multiple_loggers=True if len(loggers) > 1 else False,
         )
         trainer.test(model=method, test_dataloaders=val_dataloader)
-        method.hparams.MODEL.USE_CENTROIDS = not method.hparams.MODEL.USE_CENTROIDS
-        trainer.test(model=method, test_dataloaders=val_dataloader)
-        method.hparams.MODEL.USE_CENTROIDS = not method.hparams.MODEL.USE_CENTROIDS
+        # method.hparams.MODEL.USE_CENTROIDS = not method.hparams.MODEL.USE_CENTROIDS
+        # trainer.test(model=method, test_dataloaders=val_dataloader)
+        # method.hparams.MODEL.USE_CENTROIDS = not method.hparams.MODEL.USE_CENTROIDS
     else:
         if cfg.MODEL.RESUME_TRAINING:
             method = method.load_from_checkpoint(

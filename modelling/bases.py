@@ -245,7 +245,7 @@ class ModelBase(pl.LightningModule):
         # Make a single tensor from query and gallery data
         # centroids_embeddings: list
         # can torch stack list?
-        print(centroids_embeddings)
+        # print(centroids_embeddings)
         centroids_embeddings = torch.stack(centroids_embeddings).squeeze()
         centroids_embeddings = torch.cat(
             (embeddings_query, centroids_embeddings), dim=0
