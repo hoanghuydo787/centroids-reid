@@ -89,7 +89,7 @@ def run_single(cfg, method, logger_save_dir):
         dirname=os.path.join(logger.log_dir, "auto_checkpoints"),
         filename_prefix="checkpoint",
         n_saved=3,
-        save_interval=5,
+        save_interval=2,
     )
 
     dm = init_dataset(
