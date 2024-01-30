@@ -99,7 +99,7 @@ class R1_mAP:
             np.ndarray: distance matrix
         '''
         gf_num = gf.shape[0]
-        num_batches = (gf_num // 20000) + 35 
+        num_batches = (gf_num // 100) + 1 
         gf_batchsize = int((gf_num // num_batches))
         print(f"Computing batches with batchsize {gf_batchsize}")
         results = []
@@ -136,16 +136,13 @@ class R1_mAP:
         g_camids = np.asarray(camids[self.num_query :])
         m, n = qf.shape[0], gf.shape[0]
 
-        if n > 30000 and self.pl_module.hparams.MODEL.USE_CENTROIDS:
-            print(f"Reid metric no-ranking. Computing batches as n > 30000")
+        if n > 100 and self.pl_module.hparams.MODEL.USE_CENTROIDS:
+            print(f"Reid metric calculating. Computing batches as n > 100")
             distmat = self._commpute_batches_double(qf, gf)
             indices = np.argsort(distmat, axis=1)
         else:
             if self.hparms.MODEL.RERANKING == True:
-                q_g_dist = self.dist_func(x=qf, y=gf).cpu().numpy()
-                q_q_dist = self.dist_func(x=qf, y=qf).cpu().numpy()
-                g_g_dist = self.dist_func(x=gf, y=gf).cpu().numpy()
-                distmat = re_ranking(q_g_dist, q_q_dist, g_g_dist)
+                distmat = self._commpute_batches_double(qf, gf)
             else:
                 distmat = self.dist_func(x=qf, y=gf)
             indices = np.argsort(distmat, axis=1)
