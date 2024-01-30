@@ -131,8 +131,8 @@ def create_coco_json_with_unique_pair_id_per_category(
 
     anno_id = 0
     all_annos = []
-    all_image_ids = []  # To easily retrieve images neede for the set
-    all_products = []  # To easily retrieve products/pair_ids neede for the set
+    all_image_ids = []  # To easily retrieve images needed for the set
+    all_products = []  # To easily retrieve products/pair_ids needed for the set
 
     json_data = remapped_datasets[f"{mode}_pairs_{category_name}.json"]
 
@@ -477,7 +477,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--train-json-path",
-        help="path to json file produed by 'street2shop_to_coco.py' script",
+        help="path to json file produced by 'street2shop_to_coco.py' script",
         type=str,
         required=True,
     )

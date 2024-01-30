@@ -1,6 +1,5 @@
-#!/usr/bin/env python2/python3
 """
-Created on Mon Jun 26 14:46:56 2017
+Created on Jun 26 2017
 @author: luohao
 Modified by Houjing Huang, 2017-12-22. 
 - This version accepts distance matrix instead of raw features. 

@@ -59,7 +59,7 @@ class ModelBase(pl.LightningModule):
         elif isinstance(cfg, dict):
             hparams = {**cfg, **kwargs}
             if cfg.TEST.ONLY_TEST:
-                # To make sure that loaded hparams are overwritten by cfg we may have chnaged
+                # To make sure that loaded hparams are overwritten by cfg we may have changed
                 hparams = {**kwargs, **cfg}
         self.hparams = AttributeDict(hparams)
         self.save_hyperparameters(self.hparams)
@@ -75,6 +75,7 @@ class ModelBase(pl.LightningModule):
         )
 
         d_model = self.hparams.MODEL.BACKBONE_EMB_SIZE
+        # xent = x-ent = cross entropy
         self.xent = CrossEntropyLabelSmooth(num_classes=self.hparams.num_classes)
         self.center_loss = CenterLoss(
             num_classes=self.hparams.num_classes, feat_dim=d_model
@@ -209,7 +210,7 @@ class ModelBase(pl.LightningModule):
 
         # Create centroids for each pid seperately
         for label in unique_labels:
-            cmaids_combinations = set()
+            camids_combinations = set()
             inds = labels2idx[label]
             inds_q = labels2idx_q[label]
             if respect_camids:
@@ -228,8 +229,8 @@ class ModelBase(pl.LightningModule):
                             [cid for cid in selected_camids_g if cid != current_camid]
                         )
                     )
-                    if tuple(used_camids) not in cmaids_combinations:
-                        cmaids_combinations.add(tuple(used_camids))
+                    if tuple(used_camids) not in camids_combinations:
+                        camids_combinations.add(tuple(used_camids))
                         centroids_emb = embeddings_gallery[inds][camid_inds]
                         centroids_emb = self._calculate_centroids(centroids_emb, dim=0)
                         centroids_embeddings.append(centroids_emb.detach().cpu())
@@ -243,9 +244,6 @@ class ModelBase(pl.LightningModule):
                 centroids_embeddings.append(centroids_emb.detach().cpu())
 
         # Make a single tensor from query and gallery data
-        # centroids_embeddings: list
-        # can torch stack list?
-        # print(centroids_embeddings)
         centroids_embeddings = torch.stack(centroids_embeddings).squeeze()
         centroids_embeddings = torch.cat(
             (embeddings_query, centroids_embeddings), dim=0

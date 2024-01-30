@@ -148,4 +148,11 @@ debugs/
 
 data/
 mlruns/
+df_embeds/
+df_results/
+test_data/
+test_df_embeds/
+test_df_results/
+read_npy.py
+test.py
 ```

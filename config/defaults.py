@@ -35,7 +35,8 @@ _C.MODEL.USE_CENTROIDS = False
 _C.MODEL.KEEP_CAMID_CENTROIDS = True
 # Set True if Pre-traing path points to previously trained/aborted model
 _C.MODEL.RESUME_TRAINING = False
-
+# reranking option, default is False
+_C.MODEL.RERANKING = True
 # -----------------------------------------------------------------------------
 # INPUT
 # -----------------------------------------------------------------------------
@@ -97,7 +98,7 @@ _C.SOLVER.MOMENTUM = 0.9
 # Margin of triplet loss
 _C.SOLVER.MARGIN = 0.5
 # Function used to compute distance (euclidean or cosine for now)
-_C.SOLVER.DISTANCE_FUNC = "euclidean"
+_C.SOLVER.DISTANCE_FUNC = "cosine"
 # # Margin of cluster
 _C.SOLVER.CLUSTER_MARGIN = 0.3
 # # Learning rate of SGD to learn the centers of center loss

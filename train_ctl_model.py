@@ -79,10 +79,12 @@ class CTLModel(ModelBase):
         # Prepare masks for uneven number of sample per pid in a batch
         ir = isReal.view(unique_classes, -1)
         t = repeat(ir, "c b -> c b s", s=self.hparams.DATALOADER.NUM_INSTANCE)
+        # t_re is 
         t_re = rearrange(t, "c b s -> b (c s)")
         t_re = t_re & isReal
 
         masks, labels_list = self.create_masks_train(class_labels)  ## True for gallery
+        print("Masks: {}".format(masks))
         masks = masks.to(features.device)
         masks = masks & t_re
 

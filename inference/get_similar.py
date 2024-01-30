@@ -12,6 +12,7 @@ sys.path.append(".")
 from config import cfg
 from train_ctl_model import CTLModel
 from utils.reid_metric import get_dist_func
+from utils.reranking import re_ranking
 
 from inference_utils import (
     ImageDataset,
@@ -84,7 +85,7 @@ if __name__ == "__main__":
     ### Inference
     log.info("Running inference")
     embeddings, paths = run_inference(
-        model, val_loader, cfg, print_freq=args.print_freq
+        model, val_loader, cfg, print_freq=args.print_freq, use_cuda=True
     )
 
     ### Load gallery data
@@ -112,7 +113,18 @@ if __name__ == "__main__":
     ### Calculate similarity
     log.info("Calculating distance and getting the most similar ids per query")
     dist_func = get_dist_func(cfg.SOLVER.DISTANCE_FUNC)
-    distmat = dist_func(x=embeddings, y=embeddings_gallery).cpu().numpy()
+    
+    ### Reranking
+    if cfg.MODEL.RERANKING:
+        log.info("Using reranking")
+        q_g_dist = dist_func(x=embeddings, y=embeddings_gallery).cpu().numpy()
+        q_q_dist = dist_func(x=embeddings, y=embeddings).cpu().numpy()
+        g_g_dist = dist_func(x=embeddings_gallery, y=embeddings_gallery).cpu().numpy()
+        distmat = re_ranking(q_g_dist, q_q_dist, g_g_dist)
+    else:
+        log.info("Not using reranking")
+        distmat = dist_func(x=embeddings, y=embeddings_gallery).cpu().numpy()
+    
     indices = np.argsort(distmat, axis=1)
 
     ### Constrain the results to only topk most similar ids
@@ -126,6 +138,9 @@ if __name__ == "__main__":
         }
         for q_num, query_path in enumerate(paths)
     }
+
+    ### Convert to numpy
+    embeddings = embeddings.cpu().numpy()
 
     ### Save
     SAVE_DIR = Path(cfg.OUTPUT_DIR)

@@ -96,6 +96,7 @@ def run_single(cfg, method, logger_save_dir):
         cfg.DATASETS.NAMES, cfg=cfg, num_workers=cfg.DATALOADER.NUM_WORKERS
     )
     dm.setup()
+    # ...
     test_dataloader = None
 
     trainer = pl.Trainer(
@@ -110,8 +111,8 @@ def run_single(cfg, method, logger_save_dir):
         checkpoint_callback=checkpoint_callback,
         precision=16 if cfg.USE_MIXED_PRECISION else 32,
         resume_from_checkpoint=cfg.MODEL.PRETRAIN_PATH
-        if cfg.MODEL.RESUME_TRAINING
-        else None,
+            if cfg.MODEL.RESUME_TRAINING
+            else None,
         callbacks=[periodic_checkpointer],
         enable_pl_optimizer=True,
         reload_dataloaders_every_epoch=True,
@@ -133,6 +134,7 @@ def run_single(cfg, method, logger_save_dir):
             num_classes=dm.num_classes,
             use_multiple_loggers=True if len(loggers) > 1 else False,
         )
+        # so this code only eval on val set, not test set?
         trainer.test(model=method, test_dataloaders=val_dataloader)
         # method.hparams.MODEL.USE_CENTROIDS = not method.hparams.MODEL.USE_CENTROIDS
         # trainer.test(model=method, test_dataloaders=val_dataloader)
@@ -148,7 +150,7 @@ def run_single(cfg, method, logger_save_dir):
         else:
             method = method(
                 cfg,
-                test_dataloader=test_dataloader,
+                test_dataloader=test_dataloader, # = None
                 num_query=dm.num_query,
                 num_classes=dm.num_classes,
                 use_multiple_loggers=True if len(loggers) > 1 else False,
@@ -156,9 +158,9 @@ def run_single(cfg, method, logger_save_dir):
         trainer.fit(
             method, train_dataloader=train_loader, val_dataloaders=[val_dataloader]
         )
-        method.hparams.MODEL.USE_CENTROIDS = not method.hparams.MODEL.USE_CENTROIDS
+        # method.hparams.MODEL.USE_CENTROIDS = not method.hparams.MODEL.USE_CENTROIDS
         trainer.test(model=method, test_dataloaders=val_dataloader)
-        method.hparams.MODEL.USE_CENTROIDS = not method.hparams.MODEL.USE_CENTROIDS
+        # method.hparams.MODEL.USE_CENTROIDS = not method.hparams.MODEL.USE_CENTROIDS
 
 
 def run_main(cfg, method, logger_save_dir):

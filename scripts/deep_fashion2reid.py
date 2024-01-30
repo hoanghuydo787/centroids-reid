@@ -67,7 +67,7 @@ def scatter_images_to_folders(
         dir_path = images_root_dir_split / subset_name / dir_name
         dir_path.mkdir(parents=True, exist_ok=True)
         source_root = source.lstrip("img/")
-        for file in tqdm(files_in_dir):
+        for file in files_in_dir:
             if (dir_path / file).is_file():
                 continue
             shutil.copy(images_org_path / source_root / file, dir_path / file)
@@ -116,9 +116,8 @@ def crop_all_images(
     next_anno_id = 0
     next_img_id = 0
     all_annotations = {}
-    all_image_infos = {}  # To easily retrieve images neede for the set
-    # Crop from high-res images
-    for subset_name in tqdm(list(split_dict.keys())):
+    all_image_infos = {}  # To easily retrieve images needed for the set
+    for subset_name in list(split_dict.keys()):
         CROP_IMAGES_SAVE_PATH = crop_images_save_root / subset_name
         CROP_IMAGES_SAVE_PATH.mkdir(exist_ok=True, parents=True)
 
@@ -127,14 +126,14 @@ def crop_all_images(
         annos = []
         images_subset_root = image_root_dir_split / subset_name
 
-        for dir_name in tqdm(os.listdir(images_subset_root)):
+        for dir_name in os.listdir(images_subset_root):
             if not (images_subset_root / dir_name).is_dir():
                 continue
             pair_id = global_product_pair_id_map[
                 dir_name
             ]  # Pair id is assumed to be the same for all items in a directory of template "id_xxxxxx"
             dir_path = os.path.join(images_subset_root, dir_name)
-            for file in tqdm(os.listdir(dir_path)):
+            for file in os.listdir(dir_path):
                 new_filename = dir_name + "_" + file
                 source_filepath = os.path.join(dir_path, file)
                 # Start preparing image info and annotations

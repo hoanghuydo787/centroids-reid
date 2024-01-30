@@ -20,7 +20,7 @@ from tqdm import tqdm
 from .eval_reid import eval_func
 
 from .visrank import visualize_ranked_results
-
+from .reranking import re_ranking
 
 def get_euclidean(x, y, **kwargs):
     m = x.shape[0]
@@ -91,9 +91,17 @@ class R1_mAP:
 
     # @staticmethod
     def _commpute_batches_double(self, qf, gf):
+        '''Computes batches of the distance matrix to avoid memory issues
+        Args:
+            qf (torch.Tensor): query features
+            gf (torch.Tensor): gallery features
+        Returns:
+            np.ndarray: distance matrix
+        '''
         gf_num = gf.shape[0]
-        num_batches = (gf_num // 200000) + 35
+        num_batches = (gf_num // 20000) + 35 
         gf_batchsize = int((gf_num // num_batches))
+        print(f"Computing batches with batchsize {gf_batchsize}")
         results = []
 
         if isinstance(qf, np.ndarray):
@@ -104,8 +112,13 @@ class R1_mAP:
 
             if isinstance(gf_temp, np.ndarray):
                 gf_temp = torch.from_numpy(gf_temp).float().cuda()
-
-            distmat_temp = self.dist_func(x=qf, y=gf_temp)
+            if self.hparms.MODEL.RERANKING == True:
+                q_g_dist = self.dist_func(x=qf, y=gf_temp).cpu().numpy()
+                q_q_dist = self.dist_func(x=qf, y=qf).cpu().numpy()
+                g_g_dist = self.dist_func(x=gf_temp, y=gf_temp).cpu().numpy()
+                distmat_temp = re_ranking(q_g_dist, q_q_dist, g_g_dist)
+            else:
+                distmat_temp = self.dist_func(x=qf, y=gf_temp)
             results.append(distmat_temp)
         return np.hstack(results)
 
@@ -128,7 +141,13 @@ class R1_mAP:
             distmat = self._commpute_batches_double(qf, gf)
             indices = np.argsort(distmat, axis=1)
         else:
-            distmat = self.dist_func(x=qf, y=gf)
+            if self.hparms.MODEL.RERANKING == True:
+                q_g_dist = self.dist_func(x=qf, y=gf).cpu().numpy()
+                q_q_dist = self.dist_func(x=qf, y=qf).cpu().numpy()
+                g_g_dist = self.dist_func(x=gf, y=gf).cpu().numpy()
+                distmat = re_ranking(q_g_dist, q_q_dist, g_g_dist)
+            else:
+                distmat = self.dist_func(x=qf, y=gf)
             indices = np.argsort(distmat, axis=1)
 
         cmc, mAP, all_topk, single_performance = eval_func(
@@ -137,15 +156,27 @@ class R1_mAP:
 
         if self.hparms.TEST.VISUALIZE == "yes":
             print("Start visualization...")
-            visualize_ranked_results(
-                distmat,
-                self.dataset,
-                "image",
-                self.hparms,
-                width=self.hparms.INPUT.SIZE_TEST[1],
-                height=self.hparms.INPUT.SIZE_TEST[0],
-                save_dir=os.path.join(self.hparms.OUTPUT_DIR, "visrank"),
-                topk=self.hparms.TEST.VISUALIZE_TOPK,
-            )
+            if self.hparms.MODEL.RERANKING == True:
+                visualize_ranked_results(
+                    distmat,
+                    self.dataset,
+                    "image",
+                    self.hparms,
+                    width=self.hparms.INPUT.SIZE_TEST[1],
+                    height=self.hparms.INPUT.SIZE_TEST[0],
+                    save_dir=os.path.join(self.hparms.OUTPUT_DIR, "visrank_rerank"),
+                    topk=self.hparms.TEST.VISUALIZE_TOPK,
+                )
+            else:
+                visualize_ranked_results(
+                    distmat,
+                    self.dataset,
+                    "image",
+                    self.hparms,
+                    width=self.hparms.INPUT.SIZE_TEST[1],
+                    height=self.hparms.INPUT.SIZE_TEST[0],
+                    save_dir=os.path.join(self.hparms.OUTPUT_DIR, "visrank_no_rerank"),
+                    topk=self.hparms.TEST.VISUALIZE_TOPK,
+                )
 
         return cmc, mAP, all_topk
