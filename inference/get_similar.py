@@ -12,7 +12,7 @@ sys.path.append(".")
 from config import cfg
 from train_ctl_model import CTLModel
 from utils.reid_metric import get_dist_func
-from utils.reranking import re_ranking
+from utils.reranking import re_ranking_q_g_features, re_reranking_q_g_matrix
 
 from inference_utils import (
     ImageDataset,
@@ -120,7 +120,7 @@ if __name__ == "__main__":
         q_g_dist = dist_func(x=embeddings, y=embeddings_gallery).cpu().numpy()
         q_q_dist = dist_func(x=embeddings, y=embeddings).cpu().numpy()
         g_g_dist = dist_func(x=embeddings_gallery, y=embeddings_gallery).cpu().numpy()
-        distmat = re_ranking(q_g_dist, q_q_dist, g_g_dist)
+        distmat = re_ranking_q_g_matrix(q_g_dist, q_q_dist, g_g_dist)
     else:
         log.info("Not using reranking")
         distmat = dist_func(x=embeddings, y=embeddings_gallery).cpu().numpy()

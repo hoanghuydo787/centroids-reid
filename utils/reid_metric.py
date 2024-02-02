@@ -20,7 +20,7 @@ from tqdm import tqdm
 from .eval_reid import eval_func
 
 from .visrank import visualize_ranked_results
-from .reranking import re_ranking
+from .reranking import re_ranking_q_g_features, re_ranking_q_g_matrix, re_ranking_q_g_features_gpu
 
 def get_euclidean(x, y, **kwargs):
     m = x.shape[0]
@@ -99,26 +99,36 @@ class R1_mAP:
             np.ndarray: distance matrix
         '''
         gf_num = gf.shape[0]
-        num_batches = (gf_num // 100) + 1 
-        gf_batchsize = int((gf_num // num_batches))
-        print(f"Computing batches with batchsize {gf_batchsize}")
+        gf_batchsize = 2048
+        num_gf_batches = (gf_num // gf_batchsize) 
+        print(f"Computing gf batches with batchsize {gf_batchsize}")
+
+        qf_num = qf.shape[0]
+        qf_batchsize = 2048
+        num_qf_batches = (qf_num // qf_batchsize)
+        print(f"Computing qf batches with batchsize {qf_batchsize}")
+
         results = []
 
-        if isinstance(qf, np.ndarray):
-            qf = torch.from_numpy(qf).float().cuda()
-
-        for i in tqdm(range(num_batches + 1)):
+        for i in tqdm(range(num_gf_batches + 1)):
             gf_temp = gf[i * gf_batchsize : (i + 1) * gf_batchsize, :]
 
             if isinstance(gf_temp, np.ndarray):
                 gf_temp = torch.from_numpy(gf_temp).float().cuda()
-            if self.hparms.MODEL.RERANKING == True:
-                q_g_dist = self.dist_func(x=qf, y=gf_temp).cpu().numpy()
-                q_q_dist = self.dist_func(x=qf, y=qf).cpu().numpy()
-                g_g_dist = self.dist_func(x=gf_temp, y=gf_temp).cpu().numpy()
-                distmat_temp = re_ranking(q_g_dist, q_q_dist, g_g_dist)
-            else:
-                distmat_temp = self.dist_func(x=qf, y=gf_temp)
+        
+            results_temp = []
+            for j in tqdm(range(num_qf_batches + 1)):
+                qf_temp = qf[j * qf_batchsize : (j + 1) * qf_batchsize, :]
+
+                if isinstance(qf_temp, np.ndarray):
+                    qf_temp = torch.from_numpy(qf_temp).float().cuda()
+
+                if self.hparms.MODEL.RERANKING == True:
+                    distmat_temp_temp = re_ranking_q_g_features_gpu(qf_temp.float(), gf_temp.float()).cpu().numpy()
+                else:
+                    distmat_temp_temp = self.dist_func(qf_temp, gf_temp).cpu().numpy()
+                results_temp.append(distmat_temp_temp)
+            distmat_temp = np.vstack(results_temp)
             results.append(distmat_temp)
         return np.hstack(results)
 
@@ -136,16 +146,8 @@ class R1_mAP:
         g_camids = np.asarray(camids[self.num_query :])
         m, n = qf.shape[0], gf.shape[0]
 
-        if n > 100 and self.pl_module.hparams.MODEL.USE_CENTROIDS:
-            print(f"Reid metric calculating. Computing batches as n > 100")
-            distmat = self._commpute_batches_double(qf, gf)
-            indices = np.argsort(distmat, axis=1)
-        else:
-            if self.hparms.MODEL.RERANKING == True:
-                distmat = self._commpute_batches_double(qf, gf)
-            else:
-                distmat = self.dist_func(x=qf, y=gf)
-            indices = np.argsort(distmat, axis=1)
+        distmat = self._commpute_batches_double(qf, gf)
+        indices = np.argsort(distmat, axis=1)
 
         cmc, mAP, all_topk, single_performance = eval_func(
             indices, q_pids, g_pids, q_camids, g_camids, 50, respect_camids
